@@ -448,7 +448,7 @@ vueファイルもTypescript化してみる
 
 ### Before
 
-```typescript=
+```typescript
 <script>
 import * as types from '../../../store/mutation-types'
 import Pagination from '../../../components/Pagination'
@@ -481,7 +481,7 @@ export default {
 
 ### After
 
-```typescript=
+```typescript
 <script lang="ts">
 import Vue from 'vue'
 import axios from 'axios'
