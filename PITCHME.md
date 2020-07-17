@@ -16,7 +16,7 @@ slideOptions:
 
 ## まずは現行環境を整理
 
-仮にメディアの管理画面とすると・・・
+仮に管理画面とすると・・・
 <!-- .element: class="fragment fade-up" -->
 
 - Laravel 6
@@ -30,13 +30,16 @@ slideOptions:
 
 ### とりあえず調べてみる
 
-VueにTypescriptを導入するにはVue 2.5以上、Typescript 2.4以上が必要らしい。
-そしてTypescriptを使うには3パターンがある
-<!-- .element: class="left fragment fade-up" -->
+- VueにTypescriptを導入するにはVue 2.5以上が必要。→これはOK<!-- .element: class="left fragment fade-up" -->
+- Typescript 2.4以上が必要。→なるほど<!-- .element: class="left fragment fade-up" -->
+- そしてTypescriptを使うには3パターンがある<!-- .element: class="left fragment fade-up" -->
 
-1. `Vue.extend`だけ使う<!-- .element: class="fragment fade-up" -->
+1. `Vue.extend`を使う<!-- .element: class="fragment fade-up" -->
 2. `vue-class-component`を使う<!-- .element: class="fragment fade-up" -->
 3. `vue-property-decorator`を使う<!-- .element: class="fragment fade-up" -->
+
+![](https://i.imgur.com/vUGTe59.png? =100x)
+<!-- .element: class="fragment fade-up" -->
 
 ---
 
@@ -46,7 +49,7 @@ https://jp.vuejs.org/2017/09/23/upcoming-typescript-changes-in-vue-2.5/
 
 ---
 
-### 1. `Vue.extend`だけ使う
+### 1. Vue.extend
 
 Vue公式より
 > Vue コンポーネントオプション内部で TypeScript が型を適切に推測できるようにするには、Vue.component または Vue.extend でコンポーネントを定義する必要があります:
@@ -59,9 +62,16 @@ Vue公式より
 
 ---
 
-- つまり Vue.extend は基本的に必要らしい
-- ちなみに Vue.component を使っても内部的に Vue.extend を呼んでるらしい
-- それとVue コンポーネントオプションというのは dataとかpropsのことだ
+## つまり〜
+
+Vue コンポーネントオプション内部（dataとかpropsとかmethod内）でTypescriptが型を推測できるようにするには、Vue.extendまたはVue.component（内部的にVue.extendを呼んでいる）でコンポーネントを定義する必要があります
+<!-- .element: class="fragment fade-up" -->
+
+## 要はTypescript使うならVue.extendしろと
+<!-- .element: class="fragment fade-up" -->
+
+![](https://i.imgur.com/vUGTe59.png? =100x)
+<!-- .element: class="fragment left fade-up" -->
 
 ---
 
@@ -73,7 +83,7 @@ https://jp.vuejs.org/v2/guide/typescript.html
 
 ---
 
-### 2. `vue-class-component`を使う
+### 2. vue-class-component
 
 公式ドキュメントより
 > Vueクラスコンポーネントは、クラススタイルの構文でVueコンポーネントを作成できるライブラリです。
@@ -91,18 +101,12 @@ https://class-component.vuejs.org/
 
 ---
 
-### 3. `vue-property-decorator`を使う
+### 3. vue-property-decorator
 
 GitHubより
-> This library fully depends on vue-class-component, so please read its README before using this library.
-
----
-
-訳
 > このライブラリは、vue-class-componentに完全に依存しているため、このライブラリを使用する前に、READMEをお読みください。
 
-**つまりライブラリです。**
-**vue-class-componentの拡張版**
+**つまりvue-class-componentの拡張版ライブラリです。**
 <!-- .element: class="fragment fade-up" -->
 
 ---
@@ -133,12 +137,13 @@ https://www.typescriptlang.org/docs/handbook/decorators.html
 
 ---
 
-:thinking_face: :thinking_face:
-<!-- .slide: data-transition="fade-in" -->
+![](https://i.imgur.com/1wVrubm.jpg)
+
+<!-- .slide:  data-transition="fade" data-transition-speed="slow" -->
 
 ---
 
-# まあとりあえずどんな感じに書くん？
+# まあとりあえずどんな感じに書くの？
 
 ---
 
@@ -193,12 +198,17 @@ export default class YourComponent extends Vue {
 
 ---
 
-## なにコレ書きづらっ・・・
-
-こうサクッとTypescriptの型定義の恩恵を受けたいのよ
+# ・・・
+# ？
 <!-- .element: class="fragment fade-up" -->
 
-ちなみに@xxxがクラスデコレータ、メソッドデコレータというやつらしい。@の下のクラスやメソッドを@xxx側で監視、変更、または置換できるらしい
+---
+
+### もっと簡単に書けないのか・・・
+<!-- .element: class="fragment fade-up" -->
+
+
+※ちなみに@xxxがクラスデコレータ、メソッドデコレータというやつらしい。@の下のクラスやメソッドを@xxx側で監視、変更、または置換できるらしい
 <!-- .element: class="fragment fade-up" -->
 
 詳しくは公式ドキュメントをチェック
@@ -207,7 +217,7 @@ https://www.typescriptlang.org/docs/handbook/decorators.html
 
 ---
 
-じゃあ次にvue-class-componentを使うとするとどうなるのよ
+じゃあ次にvue-class-componentを使うとするとどうなる？
 
 1. `Vue.extend`だけ使う
 2. `vue-class-component`を使う
@@ -217,16 +227,18 @@ https://www.typescriptlang.org/docs/handbook/decorators.html
 
 ---
 
-このvue-class-componentには気をつけなければいけない点があって、propsのAPIが定義されていないんです。（ドキュメントを読んだ感じwatchとかemitとかも同様）
-propsはVue.extendしてあげないといけないらしく、つまり・・・
+このvue-class-componentだけ使おうとする時に、気をつけなければいけない点があります。
 
-Vue Class Component公式
+それはpropsやwatchはそのまま使えないので、一度componentとして定義するか、@Componentのデコレータの引数に渡してあげないといけません。
+<!-- .element: class="fragment fade-up" -->
+
 - Props Definition
 https://class-component.vuejs.org/guide/props-definition.html
+<!-- .element: class="fragment fade-up" -->
 
 ---
 
-## こんな感じ
+## こんな感じにする必要があるらしく
 
 ```typescript
 import Vue from 'vue'
@@ -251,12 +263,12 @@ export default class Greeting extends GreetingProps {
 
 ---
 
-## えぇ・・・。
+### ちょっと使いにくいです。。。
 
-一つにまとめれないんかい。そのためのvue-property-decoratorらしいです
+それらをデコレータで使いやすくしたのがvue-property-decoratorらしいです
 <!-- .element: class="fragment fade-up" -->
 
-なので選択肢としては実質、Vue.extendだけかvue-property-decoratorを使うかのようです
+なので選択肢としてはVue.extendだけかvue-property-decoratorを使うかの2択になっているようです
 <!-- .element: class="fragment fade-up" -->
 
 ということでVue.extendだけ使う方法でTypescriptを導入してみたいと思います
@@ -273,7 +285,7 @@ export default class Greeting extends GreetingProps {
 
 ---
 
-とりあえず`vue create`で作ったVue+TypescriptのサンプルPJと、Vue公式やマイクロソフト様が書いたありがたいドキュメント等を参考にしていきます
+とりあえず`vue create`で作ったVue+TypescriptのサンプルPJと、マイクロソフト様が書いたありがたいドキュメント等を参考にしていきます
 
 - TypeScript Vue Starter
 https://github.com/microsoft/TypeScript-Vue-Starter
@@ -282,19 +294,20 @@ https://jp.vuejs.org/v2/guide/typescript.html
 
 ---
 
-### 管理画面側に各種設定
+### まずは初期設定
 
 - `npm i -D typescript ts-loader`で必要なモジュールをインストール
 <!-- .element: class="fragment fade-up" -->
 - `./node_modules/.bin/tsc --version`でインストール確認
 <!-- .element: class="fragment fade-up" -->
-- サンプルPJを参考に必要そうなconfigを設定。詳細は公式ドキュメント参照
-<!-- .element: class="fragment fade-up" -->
 
 ---
 
+### tsconfig.json追加
+
+詳細は公式ドキュメント参照
+
 ```json
-// tsconfig.json
 {
   "compilerOptions": {
     "target": "es5",
@@ -336,8 +349,9 @@ https://www.typescriptlang.org/docs/handbook/compiler-options.html
 ### webpack.mix.jsを修正
 
 ```js
-- mix.js('resources/js/app.js', 'public/js/app.js')
-+ mix.ts('resources/js/app.ts', 'public/js/app.js')
+- mix.js('resources/js/tr/app.js', 'public/js/app-tr.js')
++ mix.ts('resources/js/tr/app.ts', 'public/js/app-tr.js')
+
 ```
 
 ---
@@ -357,10 +371,10 @@ declare module "*.vue" {
 
 ---
 
-app.jsをTypescriptに書き換え
+### app.jsをTypescriptに書き換え
 
 ポイント
-- TypeScript未対応のjsをimportしようとすると定義ファイルが見つからないエラーになるので一旦requireなどで対応する。（ベストは`.d.ts`の定義ファイルを作ることらしい）
+- TypeScript未対応のjsをimportしようとすると定義ファイルが見つからないエラーになるので一旦requireなどで対応する。（ベストは`d.ts`の定義ファイルを作ること）
 <!-- .element: class="fragment fade-up" -->
 - さらにrequireを使うためにはnodeの定義ファイルが必要になるので`npm i @types/node`でインストール
 <!-- .element: class="fragment fade-up" -->
@@ -371,7 +385,7 @@ app.jsをTypescriptに書き換え
 
 ### router.jsをTypescriptに書き換え
 
-RouteConfig型でroutesを作成する必要があるらしい
+RouteConfig型で作成する必要があるらしい
 
 ▼サンプルPJ
 ```typescript
@@ -411,10 +425,10 @@ export default router
 
 ### つらみポイント
 
-既存ライブラリの型定義ファイル(d.ts)に沿った使い方をしていない場合や、そもそも実装と定義ファイルに差異があってメソッドが足りない場合などは自前で型定義を拡張しなければならない
+- 既存ライブラリの型定義ファイル(d.ts)に沿った使い方をしていない場合(型が違う)や、そもそもライブラリの定義ファイルが足りていなかったりする場合などは自前で型定義を拡張しなければならない
 <!-- .element: class="fragment fade-up" -->
 
-その場合はdeclare(アンビエント宣言)を拡張します。コレをDeclaration Mergingというらしい
+- その場合はdeclare(アンビエント宣言)を拡張します。コレをDeclaration Mergingというらしい
 <!-- .element: class="fragment fade-up" -->
 
 ---
@@ -440,11 +454,15 @@ https://kakkoyakakko2.hatenablog.com/entry/2018/06/28/003000
 # 動いた！！ログインもできた
 <!-- .element: class="fragment fade-up" -->
 
+![](https://i.imgur.com/vUGTe59.png? =200x)
+<!-- .element: class="fragment fade-up" -->
+
 ---
 
-vueファイルもTypescript化してみる
+vueファイルもTypescript化してみると・・・
+（ブラックリストURL登録ページ）
 
-ブラックリストURL登録ページ
+---
 
 ### Before
 
@@ -527,12 +545,16 @@ export default Vue.extend({
 
 ---
 
-まとめ
+### まとめ
 
-- 既存のVueをts化はいけなくはなさそう
-- ただ既存ライブラリが絡む部分はかなりハマった(どういう型指定するば良いのか分からない)
-- 今回は付け焼き刃的に対応してみたが、Typescriptの基礎を知らないと辛い
-- 正直Vue3.0で正式対応版きたらそれにのっかるのがベストだと思う
+- 既存のVueをts化は一応できそう<!-- .element: class="fragment fade-up" -->
+- ただ既存ライブラリが絡む部分はかなりハマった(どういう型指定するば良いのか分からない)<!-- .element: class="fragment fade-up" -->
+- 今回は付け焼き刃的に対応してみたが、Typescriptの基礎を知らないと辛い<!-- .element: class="fragment fade-up" -->
+- 正直**Vue3.0で正式対応版きたらそれにのっかるの**がベストだと思う<!-- .element: class="fragment fade-up" -->
+
+---
+
+おわり
 
 ---
 
@@ -550,3 +572,13 @@ http://typescript.ninja/typescript-in-definitelyland/typescript-basic.html
 https://future-architect.github.io/typescript-guide/index.html
 
 ---
+
+今回の修正は「okada-typescript」のブランチにあります
+
+
+<style>
+.reveal section img {
+    border: none;
+    box-shadow: none;
+}
+</style>
